@@ -1,39 +1,17 @@
-# Configuration Nginx initiale pour la génération des certificats Let's Encrypt
-# À utiliser AVANT d'avoir les certificats
+# Configuration initiale pour obtenir le certificat Let's Encrypt
+# HTTP uniquement - pas de SSL
 
-# Upstream definition for Synapse
-upstream synapse {
-    server synapse:8008;
-}
-
-# HTTP server for ACME challenge
 server {
     listen 80;
     listen [::]:80;
-    server_name matrix.example.com;
+    server_name matrix.tchap.csm.ovh;
 
-    # Let's Encrypt ACME challenge
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
 
-    # Redirect all other traffic (une fois les certificats prêts)
     location / {
-        return 301 https://$host$request_uri;
-    }
-}
-
-# Placeholder HTTPS server (temporaire avec certificat auto-signé)
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name matrix.example.com;
-
-    # Certificat temporaire (sera remplacé par Let's Encrypt)
-    ssl_certificate /etc/letsencrypt/live/matrix.example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/matrix.example.com/privkey.pem;
-
-    location / {
-        return 503 "Service en cours de configuration...";
+        return 200 'Matrix server - waiting for SSL certificate';
+        add_header Content-Type text/plain;
     }
 }
