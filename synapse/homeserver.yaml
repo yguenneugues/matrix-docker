@@ -1,0 +1,162 @@
+# Synapse homeserver configuration
+# Documentation: https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html
+
+# Server name - this is the domain part of your user IDs
+server_name: "example.com"
+
+# Public base URL
+public_baseurl: "https://matrix.example.com/"
+
+# PID file location
+pid_file: /data/homeserver.pid
+
+# Listeners configuration
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    bind_addresses: ['0.0.0.0']
+    resources:
+      - names: [client, federation]
+        compress: false
+
+# Database configuration - PostgreSQL
+database:
+  name: psycopg2
+  args:
+    user: synapse
+    password: changeme_postgres_password
+    database: synapse
+    host: postgres
+    port: 5432
+    cp_min: 5
+    cp_max: 10
+
+# Logging configuration
+log_config: "/data/log.config"
+
+# Media store path
+media_store_path: /data/media_store
+
+# Registration settings
+enable_registration: false
+enable_registration_without_verification: false
+
+# Registration shared secret (for admin registration)
+registration_shared_secret: "changeme_registration_secret"
+
+# Macaroon secret key
+macaroon_secret_key: "changeme_macaroon_secret"
+
+# Form secret
+form_secret: "changeme_form_secret"
+
+# Signing key path
+signing_key_path: "/data/signing.key"
+
+# Trusted key servers
+trusted_key_servers:
+  - server_name: "matrix.org"
+
+# Report stats
+report_stats: false
+
+# Suppress key server warnings
+suppress_key_server_warning: true
+
+# ===========================================
+# OpenID Connect (Keycloak) Configuration
+# ===========================================
+oidc_providers:
+  - idp_id: keycloak
+    idp_name: "Keycloak"
+    idp_icon: "mxc://example.com/keycloak_icon"
+    discover: true
+    issuer: "https://keycloak.example.com/realms/master"
+    client_id: "synapse"
+    client_secret: "changeme_keycloak_client_secret"
+    scopes: ["openid", "profile", "email"]
+    authorization_endpoint: "https://keycloak.example.com/realms/master/protocol/openid-connect/auth"
+    token_endpoint: "https://keycloak.example.com/realms/master/protocol/openid-connect/token"
+    userinfo_endpoint: "https://keycloak.example.com/realms/master/protocol/openid-connect/userinfo"
+    user_mapping_provider:
+      config:
+        localpart_template: "{{ user.preferred_username }}"
+        display_name_template: "{{ user.name }}"
+        email_template: "{{ user.email }}"
+    backchannel_logout_enabled: true
+    attribute_requirements:
+      - attribute: email_verified
+        value: "true"
+
+# Password authentication - disable if using only OIDC
+password_config:
+  enabled: true
+  localdb_enabled: true
+
+# SSO configuration
+sso:
+  client_whitelist:
+    - https://element.example.com/
+
+# URL preview configuration
+url_preview_enabled: true
+url_preview_ip_range_blacklist:
+  - '127.0.0.0/8'
+  - '10.0.0.0/8'
+  - '172.16.0.0/12'
+  - '192.168.0.0/16'
+  - '100.64.0.0/10'
+  - '192.0.0.0/24'
+  - '169.254.0.0/16'
+  - '198.51.100.0/24'
+  - '203.0.113.0/24'
+  - '224.0.0.0/4'
+  - '::1/128'
+  - 'fe80::/10'
+  - 'fc00::/7'
+  - '2001:db8::/32'
+  - 'ff00::/8'
+  - 'fec0::/10'
+
+# Rate limiting
+rc_message:
+  per_second: 0.2
+  burst_count: 10
+
+rc_registration:
+  per_second: 0.17
+  burst_count: 3
+
+rc_login:
+  address:
+    per_second: 0.17
+    burst_count: 3
+  account:
+    per_second: 0.17
+    burst_count: 3
+  failed_attempts:
+    per_second: 0.17
+    burst_count: 3
+
+# Federation configuration
+federation_domain_whitelist: []
+
+# Allow public rooms list
+allow_public_rooms_without_auth: false
+allow_public_rooms_over_federation: false
+
+# Retention policy
+retention:
+  enabled: false
+
+# Push notifications
+push:
+  include_content: true
+
+# User directory
+user_directory:
+  enabled: true
+  search_all_users: false
+  prefer_local_users: true

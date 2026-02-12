@@ -1,0 +1,26 @@
+# Fichiers sensibles
+.env
+*.key
+*.pem
+
+# Données persistantes
+certbot/conf/
+certbot/www/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups
+*.sql
+*.backup
+backup/
